@@ -3,13 +3,12 @@ import '../models/yahtzee_model.dart';
 /// Controller for the model of Yahtzee.
 /// Can control of the variant of Yahtzee 
 class YahtzeeController {
-  final YahtzeeModel _model;
   YahtzeeController({
     required YahtzeeModel model,
     this.variant = Variant.pauline,
   }) : _model = model;
 
-  YahtzeeModel get model => _model;
+  final YahtzeeModel _model;
   final Variant variant;
 
   int _scoreForDiceValues = 0;

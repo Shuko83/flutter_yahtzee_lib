@@ -91,11 +91,6 @@ void main() {
       controller = YahtzeeController(model: model);
     });
 
-    // Vérifie que le contrôleur encapsule bien le modèle
-    test('encapsulates the model', () {
-      expect(controller.model, equals(model));
-    });
-
     // Vérifie que les listeners peuvent être ajoutés et retirés
     test('can register and unregister figures listeners', () {
       final testListener = _TestFiguresListener();
@@ -129,11 +124,65 @@ void main() {
       model.numberOfDieFace[DieFace.die2] = 3;
       expect(controller.isModelComplete, isTrue);
     });
+
+    // Vérifie que le listener est notifié lors d'une modification d'état d'une figure
+    test('figures listener is notified when figure state changes', () {
+      final notified = <bool>[false];
+      final listener = _TestFiguresListener(onChanged: () => notified[0] = true);
+      controller.registerFiguresListeners(listener);
+      // On modifie l'état d'une figure via le controller
+      controller.markFigureAsSucceed(YahtzeeFigure.fullHouse);
+      expect(notified[0], isTrue);
+      final notified1 = <bool>[false];
+      final listener1 = _TestFiguresListener(onChanged: () => notified1[0] = true);
+      controller.registerFiguresListeners(listener1,notifyHistory: true);
+      expect(notified1[0], isTrue);
+      final notified2 = <bool>[false];
+      final listener2 = _TestFiguresListener(onChanged: () => notified2[0] = true);
+      controller.registerFiguresListeners(listener2,notifyHistory: false);
+      controller.unregisterFiguresListeners(listener2);
+      controller.markFigureAsSucceed(YahtzeeFigure.fourOfAKind);
+      expect(notified2[0], isFalse);
+    });
+
+    // Vérifie qu'une figure n'est plus disponible une fois marquée comme succeed
+    test("a figure isn't available after being marked as succeed", () {
+      final figure = YahtzeeFigure.fullHouse;
+      // On marque la figure comme réussie
+      controller.markFigureAsSucceed(figure);
+      // Supposons que le contrôleur a une méthode ou une logique pour vérifier la disponibilité
+      // Ici, on vérifie que la figure est bien marquée comme succeed dans le modèle
+      expect(controller.figureCanBeSet(figure), isFalse);
+      expect(model.figuresState.containsKey(figure), isTrue);
+      expect(model.figuresState[figure], equals(YahtzeeState.succeed));
+      // Si tu as une méthode comme isFigureAvailable, tu peux la tester ici
+      // expect(controller.isFigureAvailable(figure), isFalse);
+    });
+
+    // Vérifie qu'après un reset, toutes les figures sont à nouveau valides/disponibles
+    test('all figures are valid/available after model reset', () {
+      // On marque plusieurs figures comme succeed
+      controller.markFigureAsSucceed(YahtzeeFigure.fullHouse);
+      controller.markFigureAsSucceed(YahtzeeFigure.fourOfAKind);
+      // On reset le modèle
+      controller.resetFigure(YahtzeeFigure.fullHouse);
+      controller.resetFigure(YahtzeeFigure.fourOfAKind);
+      // Toutes les figures doivent être absentes de figuresState (donc disponibles/non traitées)
+      for (final figure in YahtzeeFigure.values) {
+        expect(model.figuresState.containsKey(figure), isFalse);
+        expect(controller.figureCanBeSet(YahtzeeFigure.fullHouse), isTrue);
+      }
+    });
   });
+
 }
 
 // Classe de test pour les listeners
 class _TestFiguresListener implements FiguresListener {
+  final void Function()? onChanged;
+  _TestFiguresListener({this.onChanged});
   @override
-  void onFigureChanged() {}
+  void onFigureChanged() {
+    if (onChanged != null) onChanged!();
+  }
 }
