@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:yahtzee_lib/models/yahtzee_model.dart';
+import 'package:yahtzee_lib/controllers/yahtzee_controller.dart';
 
 void main() {
   group('YahtzeeModel', () {
@@ -80,4 +81,59 @@ void main() {
       expect(model.isComplete, isTrue);
     });
   });
+
+  group('YahtzeeController', () {
+    late YahtzeeModel model;
+    late YahtzeeController controller;
+
+    setUp(() {
+      model = YahtzeeModel();
+      controller = YahtzeeController(model: model);
+    });
+
+    // Vérifie que le contrôleur encapsule bien le modèle
+    test('encapsulates the model', () {
+      expect(controller.model, equals(model));
+    });
+
+    // Vérifie que les listeners peuvent être ajoutés et retirés
+    test('can register and unregister figures listeners', () {
+      final testListener = _TestFiguresListener();
+      expect(controller.registerFiguresListeners(testListener), isTrue);
+      expect(controller.unregisterFiguresListeners(testListener), isTrue);
+    });
+
+    // Vérifie qu'ajouter un listener déjà existant retourne false
+    test('registering an existing figures listener returns false', () {
+      final testListener = _TestFiguresListener();
+      expect(controller.registerFiguresListeners(testListener), isTrue);
+      expect(controller.registerFiguresListeners(testListener), isFalse);
+    });
+
+    // Vérifie que supprimer un listener non existant retourne false
+    test('unregistering a non-existing figures listener returns false', () {
+      final testListener = _TestFiguresListener();
+      expect(controller.unregisterFiguresListeners(testListener), isFalse);
+    });
+
+    // Vérifie l'accès à la propriété totalDice via le contrôleur
+    test('totalDice returns correct value', () {
+      model.numberOfDieFace[DieFace.die1] = 2;
+      model.numberOfDieFace[DieFace.die2] = 3;
+      expect(controller.totalDice, equals(5));
+    });
+
+    // Vérifie l'accès à la complétion du modèle via le contrôleur
+    test('isModelComplete returns true when model is complete', () {
+      model.numberOfDieFace[DieFace.die1] = 2;
+      model.numberOfDieFace[DieFace.die2] = 3;
+      expect(controller.isModelComplete, isTrue);
+    });
+  });
+}
+
+// Classe de test pour les listeners
+class _TestFiguresListener implements FiguresListener {
+  @override
+  void onFigureChanged() {}
 }
