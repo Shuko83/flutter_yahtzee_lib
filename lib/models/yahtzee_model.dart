@@ -6,11 +6,16 @@ class YahtzeeModel {
   final YahtzeeVariant variant;
 
   /// Represents the number of dice for each [DieFace]
-  Map<DieFace, int> _numberOfDieFace = {};
+  final Map<DieFace, int> _numberOfDieFace = {};
 
   /// Stores the state of each [YahtzeeFigure].
   /// If the figure is not in the map, it means it hasn't been processed yet.
-  Map<YahtzeeFigure, YahtzeeState> _figuresState = {};
+  final Map<YahtzeeFigure, YahtzeeState> _figuresState = {};
+
+  ///Sets of differents existing listeners
+  final Set<FiguresListener> _figuresListeners = {};
+  final Set<ValuesListener> _valuesListeners = {};
+  final Set<DifferenceListener> _differenceListeners = {};
 
   /// Sum of all dice stored in the [maximum] value
   ///
@@ -150,6 +155,82 @@ class YahtzeeModel {
     minimum = null;
     chance = null;
   }
+
+  /// Reset all ValueListeners
+  void resetValueListeners(){
+    _valuesListeners.clear();
+  } 
+
+    /// Reset all figureListeners
+  void resetfigureListeners(){
+    _figuresListeners.clear();
+  }
+
+    /// Reset all differenceListeners
+  void resetDifferenceListeners(){
+    _differenceListeners.clear();
+  }
+
+  /// Reset all listeners
+  void resetListeners(){
+    resetValueListeners();
+    resetfigureListeners();
+    resetDifferenceListeners();
+  } 
+
+  /// Register [listener] if it not yet register.
+  /// Return true if the listener is added, false otherwise.
+  /// 
+  /// If [notifyHistory], if [listener] is added, it's notify like a changed occured. 
+  bool registerFiguresListeners(FiguresListener listener, {bool notifyHistory = false}){
+    bool listenerAdded = _figuresListeners.add(listener);
+    if(listenerAdded && notifyHistory){
+      listener.onFigureChanged();
+    }
+    return listenerAdded;
+  }
+
+  /// Unregister [listener] if it's register.
+  /// Return true if the listener is removed, false otherwise. 
+  bool unregisterFiguresListeners(FiguresListener listener){
+    return _figuresListeners.remove(listener);
+  }
+
+  /// Register [listener] if it not yet register.
+  /// Return true if the listener is added, false otherwise.
+  /// 
+  /// If [notifyHistory], if [listener] is added, it's notify like a changed occured. 
+  bool registerValuesListeners(ValuesListener listener, {bool notifyHistory = false}){
+    bool listenerAdded = _valuesListeners.add(listener);
+    if(listenerAdded && notifyHistory){
+      listener.onValueChanged();
+    }
+    return listenerAdded;
+  }
+
+  /// Unregister [listener] if it's register.
+  /// Return true if the listener is removed, false otherwise. 
+  bool unregisterValuesListeners(ValuesListener listener){
+    return _valuesListeners.remove(listener);
+  }
+  
+  /// Register [listener] if it not yet register.
+  /// Return true if the listener is added, false otherwise.
+  /// 
+  /// If [notifyHistory], if [listener] is added, it's notify like a changed occured. 
+  bool registerDifferenceListeners(DifferenceListener listener, {bool notifyHistory = false}){
+    bool listenerAdded = _differenceListeners.add(listener);
+    if(listenerAdded && notifyHistory){
+      listener.onDifferenceChanged();
+    }
+    return listenerAdded;
+  }
+
+  /// Unregister [listener] if it's register.
+  /// Return true if the listener is removed, false otherwise. 
+  bool unregisterDifferenceListeners(DifferenceListener listener){
+    return _differenceListeners.remove(listener);
+  }
 }
 
 /// Represents the different variants of Yahtzee
@@ -251,4 +332,19 @@ extension YahtzeeFigureExtension on YahtzeeFigure {
     YahtzeeFigure.smallStraight => 15,
     YahtzeeFigure.threeOfAKind => 25,
   };
+}
+
+/// Interface for a listener which is notify when the difference changed.
+abstract class DifferenceListener{
+  void onDifferenceChanged();
+}
+
+/// Interface for a listener which is notify when a figure changed.
+abstract class FiguresListener{
+  void onFigureChanged();
+}
+
+/// Interface for a listener which is notify when a value changed.
+abstract class ValuesListener{
+  void onValueChanged();
 }
