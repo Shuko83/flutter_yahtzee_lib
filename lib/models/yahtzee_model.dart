@@ -13,8 +13,8 @@ class YahtzeeModel {
   final Map<YahtzeeFigure, YahtzeeState> _figuresState = {};
 
   ///Sets of differents existing listeners
-  final Set<FiguresListener> _figuresListeners = {};
-  final Set<ValuesListener> _valuesListeners = {};
+  final Map<YahtzeeFigure, List<FiguresListener>> _figuresListeners = {};
+  final Map<DieFace, List<ValuesListener>> _valuesListeners = {};
   final Set<DifferenceListener> _differenceListeners = {};
   final Set<ChanceListener> _chanceListeners = {};
 
@@ -169,7 +169,7 @@ class YahtzeeModel {
   };
 
   /// Gets the number of dice for a given face
-  int getDiceCount(DieFace face) => _numberOfDieFace[face] ?? 0;
+  int? getDiceCount(DieFace face) => _numberOfDieFace[face];
 
   void setNumberOfDiceForDieFace({ required DieFace dieFace, required int number }){
     _numberOfDieFace[dieFace] = number;
@@ -224,55 +224,53 @@ class YahtzeeModel {
   } 
 
   /// Register [listener] if it not yet register.
-  /// Return true if the listener is added, false otherwise.
   /// 
   /// If [notifyHistory], if [listener] is added, it's notify like a changed occured. 
-  bool registerFiguresListeners(FiguresListener listener, {bool notifyHistory = false, YahtzeeFigure? figure}){
-    bool listenerAdded = _figuresListeners.add(listener);
-    if(listenerAdded && notifyHistory){
-      if(figure != null)
-      {
+  void registerFiguresListeners(FiguresListener listener, {List<YahtzeeFigure> figures = YahtzeeFigure.values, bool notifyHistory = false}){
+    for(var figure in figures){
+      _figuresListeners.putIfAbsent(figure, () => []).add(listener);
+      if(notifyHistory){
         listener.onFigureChanged(figure: figure, state: figureState(figure));
       }
-      else{
-        for(var yahtzeeFigure in YahtzeeFigure.values){
-          listener.onFigureChanged(figure: yahtzeeFigure, state: figureState(yahtzeeFigure));
-        }
-      }
     }
-    return listenerAdded;
   }
 
   /// Unregister [listener] if it's register.
-  /// Return true if the listener is removed, false otherwise. 
-  bool unregisterFiguresListeners(FiguresListener listener){
-    return _figuresListeners.remove(listener);
+ 
+  void unregisterFiguresListeners(FiguresListener listener, {List<YahtzeeFigure> figures = YahtzeeFigure.values}){
+    for(var figure in figures){
+      if(_figuresListeners.containsKey(figure)){
+        _figuresListeners[figure]!.remove(listener);
+      }
+    }
   }
 
   /// Register [listener] if it not yet register.
   /// Return true if the listener is added, false otherwise.
   /// 
   /// If [notifyHistory], if [listener] is added, it's notify like a changed occured. 
-  bool registerValuesListeners(ValuesListener listener, {bool notifyHistory = false, DieFace? face}){
-    bool listenerAdded = _valuesListeners.add(listener);
-    if(listenerAdded && notifyHistory){
-      if(face != null)
-      {
+  void registerValuesListeners(ValuesListener listener, {List<DieFace> faces = DieFace.values, bool notifyHistory = false, DieFace? face}){
+    for(var face in faces){
+      _valuesListeners.putIfAbsent(face, () => []).add(listener);
+      if(notifyHistory){
         listener.onValueChanged(face: face, value: getDiceCount(face));
       }
-      else{
-        for(var dieFace in DieFace.values){
-          listener.onValueChanged(face: dieFace, value: getDiceCount(dieFace));
+    }
+  }
+
+  /// Unregister [listener] if it's register. 
+  /// Return the number of listener removed.
+  int unregisterValuesListeners(ValuesListener listener, {List<DieFace> faces = DieFace.values}){
+    int listenerRemoved = 0;
+    for(var face in faces){
+      if(_valuesListeners.containsKey(face)){
+        bool removed = _valuesListeners[face]!.remove(listener);
+        if(removed){
+          ++listenerRemoved;
         }
       }
     }
-    return listenerAdded;
-  }
-
-  /// Unregister [listener] if it's register.
-  /// Return true if the listener is removed, false otherwise. 
-  bool unregisterValuesListeners(ValuesListener listener){
-    return _valuesListeners.remove(listener);
+    return listenerRemoved;
   }
   
   /// Register [listener] if it not yet register.
@@ -295,15 +293,19 @@ class YahtzeeModel {
 
   /// Method that notify all figures listeners
   void _notifyFiguresListeners({required YahtzeeFigure figure, required YahtzeeState? state}){
-    for (var listener in _figuresListeners){
-      listener.onFigureChanged(figure: figure, state: state);
+    if(_figuresListeners.containsKey(figure)){
+      for (var listener in _figuresListeners[figure]!){
+        listener.onFigureChanged(figure: figure, state: state);
+      }
     }
   }
 
   /// Method that notify all values listeners
   void _notifyValuesListeners({required DieFace face, required int? value}){
-    for (var listener in _valuesListeners){
-      listener.onValueChanged(face: face,value: value);
+    if(_valuesListeners.containsKey(face)){
+      for (var listener in _valuesListeners[face]!){
+        listener.onValueChanged(face: face, value: getDiceCount(face));
+      }
     }
   }
   

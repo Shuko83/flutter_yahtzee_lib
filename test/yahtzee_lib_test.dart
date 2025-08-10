@@ -33,7 +33,7 @@ void main() {
 
     // Vérifie que getDiceCount retourne 0 pour une face non définie
     test('getDiceCount returns 0 for unset face', () {
-      expect(modelPauline.getDiceCount(DieFace.die1), equals(0));
+      expect(modelPauline.getDiceCount(DieFace.die1), isNull);
     });
 
     // Vérifie que totalDice additionne correctement tous les dés
@@ -117,10 +117,10 @@ void main() {
     test(' test get dice count', () {
       modelClassic.reset();
       // On vérifie qu'une face non set retourne bien 0 
-      expect(modelClassic.getDiceCount(DieFace.die2), 0);
+      expect(modelClassic.getDiceCount(DieFace.die2), isNull);
       
       modelClassic.setNumberOfDiceForDieFace(dieFace: DieFace.die1, number: 3);
-      expect(modelClassic.getDiceCount(DieFace.die1), 3);
+      expect(modelClassic.getDiceCount(DieFace.die1), equals(3));
     });
   });
 }
