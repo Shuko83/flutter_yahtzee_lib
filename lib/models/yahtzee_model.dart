@@ -6,11 +6,11 @@ class YahtzeeModel {
   final YahtzeeVariant variant;
 
   /// Represents the number of dice for each [DieFace]
-  Map<DieFace, int> numberOfDieFace = {};
+  Map<DieFace, int> _numberOfDieFace = {};
 
   /// Stores the state of each [YahtzeeFigure].
   /// If the figure is not in the map, it means it hasn't been processed yet.
-  Map<YahtzeeFigure, YahtzeeState> figuresState = {};
+  Map<YahtzeeFigure, YahtzeeState> _figuresState = {};
 
   /// Sum of all dice stored in the [maximum] value
   ///
@@ -26,7 +26,7 @@ class YahtzeeModel {
   int? chance;
 
   /// Returns the score of dice faces only (without bonus)
-  int get diceScore => numberOfDieFace.entries.fold(0, (sum, entry) => sum + (entry.value * entry.key.toInt()));
+  int get diceScore => _numberOfDieFace.entries.fold(0, (sum, entry) => sum + (entry.value * entry.key.toInt()));
 
   /// Returns the bonus threshold for the current variant
   int get upperSectionThreshold => switch(variant) {
@@ -53,10 +53,10 @@ class YahtzeeModel {
   /// Checks if a figure is successful.
   /// Returns true if the figure is present in the map and its state is [YahtzeeState.succeed].
   /// Returns false if the figure is not present in the map (i.e., not yet processed) or if it failed.
-  bool isFigureSucceed(YahtzeeFigure figure) => figuresState[figure] == YahtzeeState.succeed;
+  bool isFigureSucceed(YahtzeeFigure figure) => _figuresState[figure] == YahtzeeState.succeed;
 
   /// Checks if a figure has been processed (succeeded or failed)
-  bool isFigureProcessed(YahtzeeFigure figure) => figuresState.containsKey(figure);
+  bool isFigureProcessed(YahtzeeFigure figure) => _figuresState.containsKey(figure);
 
   /// Vérifie si une figure est disponible dans la variante actuelle
   bool isFigureAvailable(YahtzeeFigure figure) {
@@ -83,14 +83,14 @@ class YahtzeeModel {
   /// Marque une figure comme réussie si elle est disponible dans la variante
   void markFigureAsSucceed(YahtzeeFigure figure) {
     if (isFigureAvailable(figure)) {
-      figuresState[figure] = YahtzeeState.succeed;
+      _figuresState[figure] = YahtzeeState.succeed;
     }
   }
 
   /// Marque une figure comme échouée si elle est disponible dans la variante
   void markFigureAsFailed(YahtzeeFigure figure) {
     if (isFigureAvailable(figure)) {
-      figuresState[figure] = YahtzeeState.failed;
+      _figuresState[figure] = YahtzeeState.failed;
     }
   }
 
@@ -115,14 +115,37 @@ class YahtzeeModel {
         };
     }
   }
+  /// Return true if all dieFace has been set
+  /// False optherwise
+  bool get _upperSectionCompleted => _numberOfDieFace.length == DieFace.values.length;
+
+  /// Retun true if the difference has been played
+  /// False Otherwise.
+  /// Depends of maximum and minimum played
+  bool get _differenceCompleted => difference != null;
+
+  /// Return true if all figures has been played.
+  /// False otherwise.
+  bool get _figuresCompleted=> availableFigures.every((figure)=> _figuresState.containsKey(figure));
+
+
+  /// Return true if the game is completed.
+  bool get isCompleted => switch(variant){
+    YahtzeeVariant.classic => _upperSectionCompleted && _figuresCompleted && chance != null,
+    YahtzeeVariant.pauline => _upperSectionCompleted && _figuresCompleted && _differenceCompleted,
+  };
 
   /// Gets the number of dice for a given face
-  int getDiceCount(DieFace face) => numberOfDieFace[face] ?? 0;
+  int getDiceCount(DieFace face) => _numberOfDieFace[face] ?? 0;
+
+  void setNumberOfDiceForDieFace({ required DieFace dieFace, required int number }){
+    _numberOfDieFace[dieFace] = number;
+  }
 
   /// Resets the model for a new game
   void reset() {
-    numberOfDieFace.clear();
-    figuresState.clear();
+    _numberOfDieFace.clear();
+    _figuresState.clear();
     maximum = null;
     minimum = null;
     chance = null;
