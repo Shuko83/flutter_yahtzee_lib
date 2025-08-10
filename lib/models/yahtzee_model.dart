@@ -16,19 +16,20 @@ class YahtzeeModel {
   final Set<FiguresListener> _figuresListeners = {};
   final Set<ValuesListener> _valuesListeners = {};
   final Set<DifferenceListener> _differenceListeners = {};
+  final Set<ChanceListener> _chanceListeners = {};
 
-  /// Sum of all dice stored in the [maximum] value
+  /// Sum of all dice stored in the [_maximum] value
   ///
-  /// Used to calculate the score [difference] => [maximum] - [minimum]
-  int? maximum;
+  /// Used to calculate the score [difference] => [_maximum] - [_minimum]
+  int? _maximum;
 
-  /// Sum of all dice stored in the [minimum] value
+  /// Sum of all dice stored in the [_minimum] value
   ///
-  /// Used to calculate the score [difference] => [maximum] - [minimum]
-  int? minimum;
+  /// Used to calculate the score [difference] => [_maximum] - [_minimum]
+  int? _minimum;
 
   /// Sum of all dice stored in the [chance] value
-  int? chance;
+  int? _chance;
 
   /// Returns the score of dice faces only (without bonus)
   int get diceScore => _numberOfDieFace.entries.fold(0, (sum, entry) => sum + (entry.value * entry.key.toInt()));
@@ -52,16 +53,40 @@ class YahtzeeModel {
     return diceScore + bonus;
   }
 
-  /// Returns the difference between maximum and minimum
-  int? get difference => (maximum != null && minimum != null) ? maximum! - minimum! : null;
+  /// Returns the difference between _maximum and _minimum
+  int? get difference => (_maximum != null && _minimum != null) ? _maximum! - _minimum! : null;
 
+  /// Return the maximum
+  int? get maximum  => _maximum;
+  
+  /// Return the minimum
+  int? get minimum  => _minimum;
+
+  int? get chance => _chance;
+
+  set maximum(int? value){
+    _maximum = value;  
+    _notifyDifferenceListeners(difference);
+  }
+
+    set minimum(int? value){
+    _minimum = value;  
+    _notifyDifferenceListeners(difference);
+  }
+
+  set chance(int? value){
+    _chance = value;  
+    _notifyChanceListeners(value);
+  }
+
+  YahtzeeState? figureState(YahtzeeFigure figure) => _figuresState[figure];
   /// Checks if a figure is successful.
   /// Returns true if the figure is present in the map and its state is [YahtzeeState.succeed].
   /// Returns false if the figure is not present in the map (i.e., not yet processed) or if it failed.
-  bool isFigureSucceed(YahtzeeFigure figure) => _figuresState[figure] == YahtzeeState.succeed;
+  bool isFigureSucceed(YahtzeeFigure figure) => figureState(figure) == YahtzeeState.succeed;
 
   /// Checks if a figure has been processed (succeeded or failed)
-  bool isFigureProcessed(YahtzeeFigure figure) => _figuresState.containsKey(figure);
+  bool isFigureProcessed(YahtzeeFigure figure) => figureState(figure) != null;
 
   /// Vérifie si une figure est disponible dans la variante actuelle
   bool isFigureAvailable(YahtzeeFigure figure) {
@@ -85,18 +110,21 @@ class YahtzeeModel {
     }
   }
 
-  /// Marque une figure comme réussie si elle est disponible dans la variante
+  /// Add a played figure
+  void markFigure({required YahtzeeFigure figure, required YahtzeeState state})
+  {
+    _figuresState[figure] = state;
+    _notifyFiguresListeners(figure: figure, state: state);
+  }
+
+  /// Marque une figure comme réussie
   void markFigureAsSucceed(YahtzeeFigure figure) {
-    if (isFigureAvailable(figure)) {
-      _figuresState[figure] = YahtzeeState.succeed;
-    }
+    markFigure(figure: figure, state: YahtzeeState.succeed);
   }
 
   /// Marque une figure comme échouée si elle est disponible dans la variante
   void markFigureAsFailed(YahtzeeFigure figure) {
-    if (isFigureAvailable(figure)) {
-      _figuresState[figure] = YahtzeeState.failed;
-    }
+    markFigure(figure: figure, state: YahtzeeState.failed);
   }
 
   /// Retourne l'ensemble des figures disponibles pour la variante actuelle
@@ -126,7 +154,7 @@ class YahtzeeModel {
 
   /// Retun true if the difference has been played
   /// False Otherwise.
-  /// Depends of maximum and minimum played
+  /// Depends of _maximum and _minimum played
   bool get _differenceCompleted => difference != null;
 
   /// Return true if all figures has been played.
@@ -145,15 +173,32 @@ class YahtzeeModel {
 
   void setNumberOfDiceForDieFace({ required DieFace dieFace, required int number }){
     _numberOfDieFace[dieFace] = number;
+    _notifyValuesListeners(face: dieFace, value: number);
   }
 
   /// Resets the model for a new game
   void reset() {
-    _numberOfDieFace.clear();
-    _figuresState.clear();
+    resetNumberOfDieFace();
+    resetFigureStates();
     maximum = null;
     minimum = null;
     chance = null;
+  }
+  
+  void resetFigureStates(){
+    var figureToBeCleared = _figuresState.keys;
+    _figuresState.clear();
+    for(var figure in figureToBeCleared){
+      _notifyFiguresListeners(figure: figure, state: null);
+    }
+  }
+
+  void resetNumberOfDieFace(){
+    var faceToBeCleared = _numberOfDieFace.keys;
+    _numberOfDieFace.clear();
+    for(var face in faceToBeCleared){
+      _notifyValuesListeners(face: face, value: null);
+    }
   }
 
   /// Reset all ValueListeners
@@ -182,10 +227,18 @@ class YahtzeeModel {
   /// Return true if the listener is added, false otherwise.
   /// 
   /// If [notifyHistory], if [listener] is added, it's notify like a changed occured. 
-  bool registerFiguresListeners(FiguresListener listener, {bool notifyHistory = false}){
+  bool registerFiguresListeners(FiguresListener listener, {bool notifyHistory = false, YahtzeeFigure? figure}){
     bool listenerAdded = _figuresListeners.add(listener);
     if(listenerAdded && notifyHistory){
-      listener.onFigureChanged();
+      if(figure != null)
+      {
+        listener.onFigureChanged(figure: figure, state: figureState(figure));
+      }
+      else{
+        for(var yahtzeeFigure in YahtzeeFigure.values){
+          listener.onFigureChanged(figure: yahtzeeFigure, state: figureState(yahtzeeFigure));
+        }
+      }
     }
     return listenerAdded;
   }
@@ -200,10 +253,18 @@ class YahtzeeModel {
   /// Return true if the listener is added, false otherwise.
   /// 
   /// If [notifyHistory], if [listener] is added, it's notify like a changed occured. 
-  bool registerValuesListeners(ValuesListener listener, {bool notifyHistory = false}){
+  bool registerValuesListeners(ValuesListener listener, {bool notifyHistory = false, DieFace? face}){
     bool listenerAdded = _valuesListeners.add(listener);
     if(listenerAdded && notifyHistory){
-      listener.onValueChanged();
+      if(face != null)
+      {
+        listener.onValueChanged(face: face, value: getDiceCount(face));
+      }
+      else{
+        for(var dieFace in DieFace.values){
+          listener.onValueChanged(face: dieFace, value: getDiceCount(dieFace));
+        }
+      }
     }
     return listenerAdded;
   }
@@ -221,7 +282,7 @@ class YahtzeeModel {
   bool registerDifferenceListeners(DifferenceListener listener, {bool notifyHistory = false}){
     bool listenerAdded = _differenceListeners.add(listener);
     if(listenerAdded && notifyHistory){
-      listener.onDifferenceChanged();
+      listener.onDifferenceChanged(difference);
     }
     return listenerAdded;
   }
@@ -230,6 +291,34 @@ class YahtzeeModel {
   /// Return true if the listener is removed, false otherwise. 
   bool unregisterDifferenceListeners(DifferenceListener listener){
     return _differenceListeners.remove(listener);
+  }
+
+  /// Method that notify all figures listeners
+  void _notifyFiguresListeners({required YahtzeeFigure figure, required YahtzeeState? state}){
+    for (var listener in _figuresListeners){
+      listener.onFigureChanged(figure: figure, state: state);
+    }
+  }
+
+  /// Method that notify all values listeners
+  void _notifyValuesListeners({required DieFace face, required int? value}){
+    for (var listener in _valuesListeners){
+      listener.onValueChanged(face: face,value: value);
+    }
+  }
+  
+  /// Method that notify all difference listeners
+  void _notifyDifferenceListeners(int? value){
+    for (var listener in _differenceListeners){
+      listener.onDifferenceChanged(value);
+    }
+  }
+
+  /// Method that notify all chance listeners
+  void _notifyChanceListeners(int? value){
+    for (var listener in _chanceListeners){
+      listener.onChanceChanged(value);
+    }
   }
 }
 
@@ -336,15 +425,20 @@ extension YahtzeeFigureExtension on YahtzeeFigure {
 
 /// Interface for a listener which is notify when the difference changed.
 abstract class DifferenceListener{
-  void onDifferenceChanged();
+  void onDifferenceChanged(int? value);
+}
+
+/// Interface for a listener which is notify when the chance changed.
+abstract class ChanceListener{
+  void onChanceChanged(int? value);
 }
 
 /// Interface for a listener which is notify when a figure changed.
 abstract class FiguresListener{
-  void onFigureChanged();
+  void onFigureChanged({required YahtzeeFigure figure, required YahtzeeState? state});
 }
 
 /// Interface for a listener which is notify when a value changed.
 abstract class ValuesListener{
-  void onValueChanged();
+  void onValueChanged({required DieFace face, required int? value});
 }
