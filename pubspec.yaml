@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  dice_icons: ^0.1.7
 
 dev_dependencies:
   flutter_test:

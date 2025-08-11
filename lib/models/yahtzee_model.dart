@@ -1,3 +1,4 @@
+import 'die_face.dart';
 
 /// Represents the model of a Yahtzee game
 class YahtzeeModel {
@@ -69,7 +70,7 @@ class YahtzeeModel {
     _notifyDifferenceListeners(difference);
   }
 
-    set minimum(int? value){
+  set minimum(int? value){
     _minimum = value;  
     _notifyDifferenceListeners(difference);
   }
@@ -79,14 +80,28 @@ class YahtzeeModel {
     _notifyChanceListeners(value);
   }
 
-  YahtzeeState? figureState(YahtzeeFigure figure) => _figuresState[figure];
+  int get totalFigureScore{
+    int score = 0;
+    for(var entry in _figuresState.entries){
+      if(entry.value == YahtzeeState.succeed){
+        score += entry.key.score;
+      }
+    }
+    return score;
+  }  
+
+  int get totalScore => switch(variant){
+    YahtzeeVariant.classic => upperSectionScore + totalFigureScore + (chance??0),
+    YahtzeeVariant.pauline => upperSectionScore + totalFigureScore + (difference??0),
+  }; 
+  YahtzeeState? getFigureState(YahtzeeFigure figure) => _figuresState[figure];
   /// Checks if a figure is successful.
   /// Returns true if the figure is present in the map and its state is [YahtzeeState.succeed].
   /// Returns false if the figure is not present in the map (i.e., not yet processed) or if it failed.
-  bool isFigureSucceed(YahtzeeFigure figure) => figureState(figure) == YahtzeeState.succeed;
+  bool isFigureSucceed(YahtzeeFigure figure) => getFigureState(figure) == YahtzeeState.succeed;
 
   /// Checks if a figure has been processed (succeeded or failed)
-  bool isFigureProcessed(YahtzeeFigure figure) => figureState(figure) != null;
+  bool isFigureProcessed(YahtzeeFigure figure) => getFigureState(figure) != null;
 
   /// Vérifie si une figure est disponible dans la variante actuelle
   bool isFigureAvailable(YahtzeeFigure figure) {
@@ -239,7 +254,7 @@ class YahtzeeModel {
     for(var figure in figures){
       _figuresListeners.putIfAbsent(figure, () => []).add(listener);
       if(notifyHistory){
-        listener.onFigureChanged(figure: figure, state: figureState(figure));
+        listener.onFigureChanged(figure: figure, state: getFigureState(figure));
       }
     }
   }
@@ -258,7 +273,7 @@ class YahtzeeModel {
   /// Return true if the listener is added, false otherwise.
   /// 
   /// If [notifyHistory], if [listener] is added, it's notify like a changed occured. 
-  void registerValuesListeners(ValuesListener listener, {List<DieFace> faces = DieFace.values, bool notifyHistory = false, DieFace? face}){
+  void registerValuesListeners(ValuesListener listener, {List<DieFace> faces = DieFace.values, bool notifyHistory = false}){
     for(var face in faces){
       _valuesListeners.putIfAbsent(face, () => []).add(listener);
       if(notifyHistory){
@@ -269,17 +284,12 @@ class YahtzeeModel {
 
   /// Unregister [listener] if it's register. 
   /// Return the number of listener removed.
-  int unregisterValuesListeners(ValuesListener listener, {List<DieFace> faces = DieFace.values}){
-    int listenerRemoved = 0;
+  void unregisterValuesListeners(ValuesListener listener, {List<DieFace> faces = DieFace.values}){
     for(var face in faces){
       if(_valuesListeners.containsKey(face)){
-        bool removed = _valuesListeners[face]!.remove(listener);
-        if(removed){
-          ++listenerRemoved;
-        }
+        _valuesListeners[face]!.remove(listener);
       }
     }
-    return listenerRemoved;
   }
   
   /// Register [listener] if it not yet register.
@@ -337,16 +347,6 @@ class YahtzeeModel {
 enum YahtzeeVariant {
   classic,  // Yahtzee classique
   pauline,  // Variante Pauline
-}
-
-/// Represents the different faces of a die
-enum DieFace {
-  die1,
-  die2,
-  die3,
-  die4,
-  die5,
-  die6,
 }
 
 /// Represents the success or failure of a figure
