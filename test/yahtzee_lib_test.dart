@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:yahtzee_lib/models/yahtzee_model.dart';
 import 'package:yahtzee_lib/models/die_face.dart';
+import 'package:yahtzee_lib/models/yahtzee_figure.dart';
+import 'package:yahtzee_lib/models/yahtzee_state.dart';
 
 void main() {
   group('YahtzeeModelPauline', () {

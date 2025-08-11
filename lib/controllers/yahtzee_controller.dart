@@ -1,5 +1,7 @@
 import '../models/yahtzee_model.dart';
 import '../models/die_face.dart';
+import '../../models/yahtzee_figure.dart';
+import '../../models/yahtzee_state.dart';
 
 /// Controller for the model of Yahtzee.
 /// Can control of the variant of Yahtzee 
@@ -9,9 +11,6 @@ class YahtzeeController {
   }) : _model = model;
 
   final YahtzeeModel _model;
-
-  int _scoreForDiceValues = 0;
-  int? _difference;
 
   /// ----------- Listeners
 
