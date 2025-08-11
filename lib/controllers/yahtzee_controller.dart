@@ -2,6 +2,7 @@ import '../models/yahtzee_model.dart';
 import '../models/die_face.dart';
 import '../../models/yahtzee_figure.dart';
 import '../../models/yahtzee_state.dart';
+import '../../models/yahtzee_listeners.dart';
 
 /// Controller for the model of Yahtzee.
 /// Can control of the variant of Yahtzee 
@@ -184,6 +185,13 @@ class YahtzeeController {
     return _model.difference;
   }
 
+  int getDistanceToBonus(){
+    return _model.getDistanceToBonus();
+  }
+
+  bool get bonusSuccess => getDistanceToBonus()<= 0;
+
+  Set<YahtzeeFigure> get availableFigures => _model.availableFigures;
   /// Ajoute ou met à jour le nombre de dés pour une valeur
   /// Notifie les listeners appropriés
   void setDiceCount(DieFace value, int count) {
