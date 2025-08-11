@@ -110,6 +110,10 @@ class YahtzeeModel {
     }
   }
 
+ void resetFigure(YahtzeeFigure figure){
+    _figuresState.remove(figure);
+    _notifyFiguresListeners(figure: figure, state: null);
+ }
   /// Add a played figure
   void markFigure({required YahtzeeFigure figure, required YahtzeeState state})
   {
@@ -174,6 +178,11 @@ class YahtzeeModel {
   void setNumberOfDiceForDieFace({ required DieFace dieFace, required int number }){
     _numberOfDieFace[dieFace] = number;
     _notifyValuesListeners(face: dieFace, value: number);
+  }
+
+  void resetNumberOfDiceForDieFace(DieFace dieFace){
+    _numberOfDieFace.remove(dieFace);
+    _notifyValuesListeners(face: dieFace, value: null);
   }
 
   /// Resets the model for a new game
