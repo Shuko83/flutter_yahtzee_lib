@@ -157,9 +157,9 @@ class YahtzeeModel {
     switch (variant) {
       case YahtzeeVariant.pauline:
         return {
-          YahtzeeFigure.fourOfAKind,
-          YahtzeeFigure.fullHouse,
           YahtzeeFigure.longStraight,
+          YahtzeeFigure.fullHouse,
+          YahtzeeFigure.fourOfAKind,
           YahtzeeFigure.yahtzee,
         };
       case YahtzeeVariant.classic:
