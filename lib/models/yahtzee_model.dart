@@ -53,11 +53,14 @@ class YahtzeeModel {
   int getDistanceToBonus(){
     return upperSectionThreshold - diceScore;
   }
+
+  int get bonusScore {
+    return diceScore >= upperSectionThreshold ? upperSectionBonus : 0;
+  }
   /// Returns the upper section score (dice score + bonus if dice score >= threshold)
   int get upperSectionScore {
-    // Bonus selon la variante si le score des dés atteint le seuil
-    int bonus = diceScore >= upperSectionThreshold ? upperSectionBonus : 0;
-    return diceScore + bonus;
+    // Bonus selon la variante si le score des dés atteint le seuil 
+    return diceScore + bonusScore;
   }
 
   /// Returns the difference between _maximum and _minimum
@@ -73,17 +76,17 @@ class YahtzeeModel {
 
   set maximum(int? value){
     _maximum = value;  
-    _notifyDifferenceListeners(difference);
+    _notifyDifferenceListeners();
   }
 
   set minimum(int? value){
     _minimum = value;  
-    _notifyDifferenceListeners(difference);
+    _notifyDifferenceListeners();
   }
 
   set chance(int? value){
     _chance = value;  
-    _notifyChanceListeners(value);
+    _notifyChanceListeners();
   }
 
   int get totalFigureScore{
@@ -101,6 +104,14 @@ class YahtzeeModel {
     YahtzeeVariant.pauline => upperSectionScore + totalFigureScore + (difference??0),
   }; 
   YahtzeeState? getFigureState(YahtzeeFigure figure) => _figuresState[figure];
+
+  int? getScoreForFigure(YahtzeeFigure figure){
+    var state = _figuresState[figure];
+    if(state != null && state == YahtzeeState.succeed){
+      return figure.score; 
+    }
+    return null;
+  }
   /// Checks if a figure is successful.
   /// Returns true if the figure is present in the map and its state is [YahtzeeState.succeed].
   /// Returns false if the figure is not present in the map (i.e., not yet processed) or if it failed.
@@ -133,13 +144,13 @@ class YahtzeeModel {
 
  void resetFigure(YahtzeeFigure figure){
     _figuresState.remove(figure);
-    _notifyFiguresListeners(figure: figure, state: null);
+    _notifyFiguresListeners(figure: figure);
  }
   /// Add a played figure
   void markFigure({required YahtzeeFigure figure, required YahtzeeState state})
   {
     _figuresState[figure] = state;
-    _notifyFiguresListeners(figure: figure, state: state);
+    _notifyFiguresListeners(figure: figure);
   }
 
   /// Marque une figure comme réussie
@@ -198,12 +209,12 @@ class YahtzeeModel {
 
   void setNumberOfDiceForDieFace({ required DieFace dieFace, required int number }){
     _numberOfDieFace[dieFace] = number;
-    _notifyValuesListeners(face: dieFace, value: number);
+    _notifyValuesListeners(face: dieFace);
   }
 
   void resetNumberOfDiceForDieFace(DieFace dieFace){
     _numberOfDieFace.remove(dieFace);
-    _notifyValuesListeners(face: dieFace, value: null);
+    _notifyValuesListeners(face: dieFace);
   }
 
   /// Resets the model for a new game
@@ -219,7 +230,7 @@ class YahtzeeModel {
     var figureToBeCleared = _figuresState.keys;
     _figuresState.clear();
     for(var figure in figureToBeCleared){
-      _notifyFiguresListeners(figure: figure, state: null);
+      _notifyFiguresListeners(figure: figure);
     }
   }
 
@@ -227,7 +238,7 @@ class YahtzeeModel {
     var faceToBeCleared = _numberOfDieFace.keys;
     _numberOfDieFace.clear();
     for(var face in faceToBeCleared){
-      _notifyValuesListeners(face: face, value: null);
+      _notifyValuesListeners(face: face);
     }
   }
 
@@ -283,7 +294,7 @@ class YahtzeeModel {
     for(var face in faces){
       _valuesListeners.putIfAbsent(face, () => []).add(listener);
       if(notifyHistory){
-        listener.onValueChanged(face: face, value: getDiceCount(face));
+        listener.onValueChanged(face: face, value: getDiceCount(face), upperSectionScore: upperSectionScore, totalDieFaceScore: diceScore, bonusScore: bonusScore);
       }
     }
   }
@@ -305,7 +316,7 @@ class YahtzeeModel {
   bool registerDifferenceListeners(DifferenceListener listener, {bool notifyHistory = false}){
     bool listenerAdded = _differenceListeners.add(listener);
     if(listenerAdded && notifyHistory){
-      listener.onDifferenceChanged(difference);
+      listener.onDifferenceChanged(difference: difference, maximum: maximum, minimum: minimum);
     }
     return listenerAdded;
   }
@@ -317,34 +328,34 @@ class YahtzeeModel {
   }
 
   /// Method that notify all figures listeners
-  void _notifyFiguresListeners({required YahtzeeFigure figure, required YahtzeeState? state}){
+  void _notifyFiguresListeners({required YahtzeeFigure figure}){
     if(_figuresListeners.containsKey(figure)){
       for (var listener in _figuresListeners[figure]!){
-        listener.onFigureChanged(figure: figure, state: state);
+        listener.onFigureChanged(figure: figure, state: getFigureState(figure));
       }
     }
   }
 
   /// Method that notify all values listeners
-  void _notifyValuesListeners({required DieFace face, required int? value}){
+  void _notifyValuesListeners({required DieFace face}){
     if(_valuesListeners.containsKey(face)){
       for (var listener in _valuesListeners[face]!){
-        listener.onValueChanged(face: face, value: getDiceCount(face));
+        listener.onValueChanged(face: face, value: getDiceCount(face), upperSectionScore: upperSectionScore, totalDieFaceScore: diceScore, bonusScore: bonusScore);
       }
     }
   }
   
   /// Method that notify all difference listeners
-  void _notifyDifferenceListeners(int? value){
+  void _notifyDifferenceListeners(){
     for (var listener in _differenceListeners){
-      listener.onDifferenceChanged(value);
+      listener.onDifferenceChanged(difference: difference, maximum: maximum, minimum: minimum);
     }
   }
 
   /// Method that notify all chance listeners
-  void _notifyChanceListeners(int? value){
+  void _notifyChanceListeners(){
     for (var listener in _chanceListeners){
-      listener.onChanceChanged(value);
+      listener.onChanceChanged(chance);
     }
   }
 }

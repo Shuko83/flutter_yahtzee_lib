@@ -191,6 +191,9 @@ class YahtzeeController {
 
   bool get bonusSuccess => getDistanceToBonus()<= 0;
 
+  int? getScoreForFigure(YahtzeeFigure figure){
+    return _model.getScoreForFigure(figure);
+  }
   Set<YahtzeeFigure> get availableFigures => _model.availableFigures;
   /// Ajoute ou met à jour le nombre de dés pour une valeur
   /// Notifie les listeners appropriés
@@ -210,4 +213,9 @@ class YahtzeeController {
 
   /// Vérifie si le modèle est complet (5 dés assignés)
   bool get isModelComplete => _model.isCompleted;
+
+  /// Return the total score for the model 
+  int getTotalScore(){
+    return _model.totalScore;
+  }
 }

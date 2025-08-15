@@ -4,7 +4,7 @@ import 'die_face.dart';
 
 /// Interface for a listener which is notify when the difference changed.
 abstract class DifferenceListener{
-  void onDifferenceChanged(int? value);
+  void onDifferenceChanged({int? difference, int? maximum, int? minimum});
 }
 
 /// Interface for a listener which is notify when the chance changed.
@@ -14,10 +14,10 @@ abstract class ChanceListener{
 
 /// Interface for a listener which is notify when a figure changed.
 abstract class FiguresListener{
-  void onFigureChanged({required YahtzeeFigure figure, required YahtzeeState? state});
+  void onFigureChanged({required YahtzeeFigure figure, required YahtzeeState? state, int? totalFigureScore});
 }
 
 /// Interface for a listener which is notify when a value changed.
 abstract class ValuesListener{
-  void onValueChanged({required DieFace face, required int? value});
+  void onValueChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore});
 }
