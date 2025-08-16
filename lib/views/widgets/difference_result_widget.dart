@@ -53,13 +53,13 @@ class _DifferenceResultWidgetState extends State<DifferenceResultWidget> impleme
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(padding:  const EdgeInsets.symmetric(vertical: 4.0),
+        Padding(padding:  const EdgeInsets.symmetric(vertical: 1.0),
             child: Text(_maximum) 
         ),
-        Padding(padding:  const EdgeInsets.symmetric(vertical: 4.0),
+        Padding(padding:  const EdgeInsets.symmetric(vertical: 1.0),
             child: Text(_minimum) 
         ),
-        Padding(padding:  const EdgeInsets.symmetric(vertical: 4.0),
+        Padding(padding:  const EdgeInsets.symmetric(vertical: 1.0),
             child: Text(_difference) 
         ),
       ]

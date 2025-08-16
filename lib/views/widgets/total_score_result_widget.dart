@@ -57,7 +57,7 @@ class _TotalScoreResultWidgetState extends State<TotalScoreResultWidget> impleme
 
   @override
   Widget build(BuildContext context) {
-    return Padding(padding:  const EdgeInsets.symmetric(vertical: 4.0),
+    return Padding(padding:  const EdgeInsets.symmetric(vertical: 1.0),
       child: Text(_totalScore) 
     );
   }

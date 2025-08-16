@@ -18,7 +18,7 @@ class PlayerResultWidget extends StatelessWidget{
     return Column(
       children: [
         //Name of player
-        Padding(padding: const EdgeInsets.symmetric(vertical: 8.0),
+        Padding(padding: const EdgeInsets.symmetric(vertical: 2.0),
           child: Text(
             player.name,
             style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 16),

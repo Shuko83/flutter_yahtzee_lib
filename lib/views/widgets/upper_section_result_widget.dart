@@ -56,16 +56,16 @@ class _UpperSectionResultWidgetState extends State<UpperSectionResultWidget> imp
     return Column(
       children: [
         for(var dieFace in DieFace.values)
-          Padding(padding:  const EdgeInsets.symmetric(vertical: 4.0),
+          Padding(padding:  const EdgeInsets.symmetric(vertical: 1.0),
             child: DieFaceResultWidget(controller: widget.controller, face: dieFace),
           ),
-        Padding(padding:  const EdgeInsets.symmetric(vertical: 4.0),
+        Padding(padding:  const EdgeInsets.symmetric(vertical: 1.0),
             child: Text(_totalDieFaceScore) 
         ),
-        Padding(padding:  const EdgeInsets.symmetric(vertical: 4.0),
+        Padding(padding:  const EdgeInsets.symmetric(vertical: 1.0),
             child: Text(_bonusScore) 
         ),
-        Padding(padding:  const EdgeInsets.symmetric(vertical: 4.0),
+        Padding(padding:  const EdgeInsets.symmetric(vertical: 1.0),
             child: Text(_totalUpperSectionScore) 
         ),
       ]

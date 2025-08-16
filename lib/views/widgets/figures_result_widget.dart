@@ -48,10 +48,10 @@ class _FiguresResultWidgetState extends State<FiguresResultWidget> implements Fi
     return Column(
       children: [
         for(var figure in YahtzeeFigure.values)
-          Padding(padding:  const EdgeInsets.symmetric(vertical: 4.0),
+          Padding(padding:  const EdgeInsets.symmetric(vertical: 1.0),
             child: FigureResultWidget(controller: widget.controller, figure: figure),
           ),
-        Padding(padding:  const EdgeInsets.symmetric(vertical: 4.0),
+        Padding(padding:  const EdgeInsets.symmetric(vertical: 1.0),
             child: Text(_totalFigureScore) 
         ),
       ]

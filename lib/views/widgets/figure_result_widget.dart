@@ -47,8 +47,6 @@ class _FigureResultWidgetState extends State<FigureResultWidget> implements Figu
 
   @override
   Widget build(BuildContext context) {
-    return Padding(padding:  const EdgeInsets.symmetric(vertical: 4.0),
-      child: Text(_score) 
-    );
+    return Text(_score);
   }
 }
