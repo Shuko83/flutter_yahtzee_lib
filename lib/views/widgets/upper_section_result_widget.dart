@@ -18,14 +18,14 @@ class UpperSectionResultWidget extends StatefulWidget{
   State<UpperSectionResultWidget> createState() => _UpperSectionResultWidgetState();
 }
 
-class _UpperSectionResultWidgetState extends State<UpperSectionResultWidget> implements ValuesListener{
+class _UpperSectionResultWidgetState extends State<UpperSectionResultWidget> implements DieFacesListener{
 
   String _totalDieFaceScore = "";
   String _bonusScore = "";
   String _totalUpperSectionScore = "";
 
   @override
-  void onValueChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore}){
+  void onNumberOfDieFaceChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore}){
     setState(() {
       if(totalDieFaceScore != null){
         _totalDieFaceScore = totalDieFaceScore.toString();

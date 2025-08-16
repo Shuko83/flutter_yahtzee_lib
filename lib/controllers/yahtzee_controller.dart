@@ -19,27 +19,27 @@ class YahtzeeController {
   /// Return true if the listener is added, false otherwise.
   /// 
   /// If [notifyHistory], if [listener] is added, it's notify like a changed occured. 
-  void registerFiguresListeners(FiguresListener listener, {List<YahtzeeFigure> figures = YahtzeeFigure.values, bool notifyHistory = false}){
-    _model.registerFiguresListeners(listener, figures: figures, notifyHistory: notifyHistory);
+  int registerFiguresListeners(FiguresListener listener, {List<YahtzeeFigure> figures = YahtzeeFigure.values, bool notifyHistory = false}){
+    return _model.registerFiguresListeners(listener, figures: figures, notifyHistory: notifyHistory);
   }
 
   /// Unregister [listener] if it's register.
   /// Return true if the listener is removed, false otherwise. 
-  void unregisterFiguresListeners(FiguresListener listener){
-    _model.unregisterFiguresListeners(listener);
+  int unregisterFiguresListeners(FiguresListener listener){
+    return _model.unregisterFiguresListeners(listener);
   }
 
   /// Register [listener] if it not yet register.
   /// Return true if the listener is added, false otherwise.
   /// 
   /// If [notifyHistory], if [listener] is added, it's notify like a changed occured. 
-  void registerValuesListeners(ValuesListener listener, {List<DieFace> faces = DieFace.values, bool notifyHistory = false}){
+  void registerValuesListeners(DieFacesListener listener, {List<DieFace> faces = DieFace.values, bool notifyHistory = false}){
     _model.registerValuesListeners(listener,notifyHistory: notifyHistory, faces:faces );
   }
 
   /// Unregister [listener] if it's register.
   /// Return true if the listener is removed, false otherwise. 
-  void unregisterValuesListeners(ValuesListener listener, {List<DieFace> faces = DieFace.values}){
+  void unregisterValuesListeners(DieFacesListener listener, {List<DieFace> faces = DieFace.values}){
     _model.unregisterValuesListeners(listener, faces: faces);
   }
   
@@ -55,6 +55,20 @@ class YahtzeeController {
   /// Return true if the listener is removed, false otherwise. 
   bool unregisterDifferenceListeners(DifferenceListener listener){
     return _model.unregisterDifferenceListeners(listener);
+  }
+
+  /// Register [TotalScoreListener] [listener] if it not yet register.
+  /// 
+  /// Return true if the listener is added, false otherwise.
+  bool registerTotalScoreListener(TotalScoreListener listener, {bool notifyHistory = false}) {
+    return _model.registerTotalScoreListeners(listener: listener, notifyHistory: notifyHistory);
+  }
+
+  /// Unegister [TotalScoreListener] [listener] if it registered.
+  ///  
+  /// Return true if the listener is removed, false otherwise.
+  bool unregisterTotalScoreListener(TotalScoreListener listener, {bool notifyHistory = false}) {
+    return _model.unregisterTotalScoreListeners(listener);
   }
 
   /// ----------- Interaction with the model
@@ -81,7 +95,7 @@ class YahtzeeController {
 
   /// Clean the model for the specific [value]
   void resetValue(DieFace value){
-    _model.resetNumberOfDiceForDieFace(value);
+    _model.setNumberOfDiceForDieFace(dieFace: value, number: null);
   }
 
   /// Set [value] on the maximum if it's possible
@@ -146,12 +160,12 @@ class YahtzeeController {
   
   /// Reset the stat of the [figure]
   void resetFigure(YahtzeeFigure figure){
-    _model.resetFigure(figure);
+    _model.markFigure(figure: figure, state: null);
   }
 
   ///Return true if [figure] can be set
   bool figureCanBeSet(YahtzeeFigure figure){
-    return !_model.isFigureProcessed(figure);
+    return _model.getFigureState(figure) == null;;
   }
 
   /// Return the state of the [figure] if it's possible
@@ -186,7 +200,7 @@ class YahtzeeController {
   }
 
   int getDistanceToBonus(){
-    return _model.getDistanceToBonus();
+    return _model.getMissingScoreForBonus();
   }
 
   bool get bonusSuccess => getDistanceToBonus()<= 0;

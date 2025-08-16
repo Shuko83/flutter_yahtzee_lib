@@ -2,9 +2,11 @@ import 'yahtzee_figure.dart';
 import 'yahtzee_state.dart';
 import 'die_face.dart';
 
-/// Interface for a listener which is notify when the difference changed.
+/// Interface for a listener which is notify when the difference, the maximum or the minimum changed.
 abstract class DifferenceListener{
-  void onDifferenceChanged({int? difference, int? maximum, int? minimum});
+  void onDifferenceChanged(int? difference);
+  void onMinimumChanged(int? minimum);
+  void onMaximumChanged(int? maximum);
 }
 
 /// Interface for a listener which is notify when the chance changed.
@@ -14,10 +16,19 @@ abstract class ChanceListener{
 
 /// Interface for a listener which is notify when a figure changed.
 abstract class FiguresListener{
-  void onFigureChanged({required YahtzeeFigure figure, required YahtzeeState? state, int? totalFigureScore});
+  void onFigureChanged({required YahtzeeFigure figure, required YahtzeeState? state});
+  void onTotalFigureScoreChanged(int? totalFigureScore);
 }
 
 /// Interface for a listener which is notify when a value changed.
-abstract class ValuesListener{
-  void onValueChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore});
+abstract class DieFacesListener{
+  void onNumberOfDieFaceChanged({required DieFace face, required int? value});
+  void onBonusChanged(int? bonusScore);
+  void onUpperSectionScoreChanged(int? upperSectionScore);
+  void onTotalDieFaceScoreChanged(int? totalDieFaceScore);
+}
+
+/// Interface for a listener which is notify when the total score changed.
+abstract class TotalScoreListener{
+  void onTotalScoreChanged(int value);
 }

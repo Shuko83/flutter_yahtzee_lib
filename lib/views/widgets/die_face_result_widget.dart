@@ -19,11 +19,11 @@ class DieFaceResultWidget extends StatefulWidget{
   State<DieFaceResultWidget> createState() => _DieFaceResultWidgetState();
 }
 
-class _DieFaceResultWidgetState extends State<DieFaceResultWidget> implements ValuesListener{
+class _DieFaceResultWidgetState extends State<DieFaceResultWidget> implements DieFacesListener{
 
   String _score = "";
   @override
-  void onValueChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore}){
+  void onNumberOfDieFaceChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore}){
     setState(() {
       if(value != null){
         _score = value.toString();

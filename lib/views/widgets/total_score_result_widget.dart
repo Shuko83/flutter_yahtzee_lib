@@ -19,7 +19,7 @@ class TotalScoreResultWidget extends StatefulWidget{
   State<TotalScoreResultWidget> createState() => _TotalScoreResultWidgetState();
 }
 
-class _TotalScoreResultWidgetState extends State<TotalScoreResultWidget> implements FiguresListener, ValuesListener, DifferenceListener{
+class _TotalScoreResultWidgetState extends State<TotalScoreResultWidget> implements FiguresListener, DieFacesListener, DifferenceListener{
 
   String _totalScore = "";
   @override
@@ -33,7 +33,7 @@ class _TotalScoreResultWidgetState extends State<TotalScoreResultWidget> impleme
   }
 
   @override
-  void onValueChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore}) {
+  void onNumberOfDieFaceChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore}) {
     _updateState();
   }
 

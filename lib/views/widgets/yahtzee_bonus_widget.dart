@@ -18,12 +18,12 @@ class YahtzeeBonusWidget extends StatefulWidget{
   
 }
 
-class _YahtzeeBonusWidgetState extends State<YahtzeeBonusWidget> implements ValuesListener{
+class _YahtzeeBonusWidgetState extends State<YahtzeeBonusWidget> implements DieFacesListener{
   late String pointNeeded;
 
 
   @override
-  void onValueChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore}){
+  void onNumberOfDieFaceChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore}){
   /// Need to rebuild widget with correct value.
    setState(() {
     pointNeeded = widget.controller.getDistanceToBonus().toString();
