@@ -19,52 +19,38 @@ class TotalScoreResultWidget extends StatefulWidget{
   State<TotalScoreResultWidget> createState() => _TotalScoreResultWidgetState();
 }
 
-class _TotalScoreResultWidgetState extends State<TotalScoreResultWidget> implements FiguresListener, DieFacesListener, DifferenceListener{
+class _TotalScoreResultWidgetState extends State<TotalScoreResultWidget> implements TotalScoreListener{
 
   String _totalScore = "";
-  @override
-  void onFigureChanged({required YahtzeeFigure figure, required YahtzeeState? state, int? totalFigureScore}){
-    _updateState();
-  }
-
-  @override
-  void onDifferenceChanged({int? difference, int? maximum, int? minimum}) {
-    _updateState();
-  }
-
-  @override
-  void onNumberOfDieFaceChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore}) {
-    _updateState();
-  }
-
+  
   @override
   void initState() {
     super.initState();
     var controller = widget.controller;
-    controller.registerFiguresListeners(this,notifyHistory: true);
-    controller.registerDifferenceListeners(this);
-    controller.registerDifferenceListeners(this);
+    controller.registerTotalScoreListener(this,notifyHistory: true);
   }
 
   @override
   void dispose(){
     var controller = widget.controller;
-    controller.unregisterFiguresListeners(this);
-    controller.unregisterDifferenceListeners(this);
-    controller.unregisterDifferenceListeners(this);
+    controller.unregisterTotalScoreListener(this,notifyHistory: true);
     super.dispose();
   }
-
+  @override
+  void onTotalScoreChanged(int value) {
+    // TODO: implement onTotalScoreChanged
+  }
+    setState(() {
+      _totalScore = value.toString();
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Padding(padding:  const EdgeInsets.symmetric(vertical: 1.0),
       child: Text(_totalScore) 
     );
   }
+  
 
-  void _updateState(){
-    setState(() {
-      _totalScore = widget.controller.getTotalScore().toString();
-    });
-  }
 }

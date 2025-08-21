@@ -23,16 +23,13 @@ class _DifferenceResultWidgetState extends State<DifferenceResultWidget> impleme
   String _difference = "";
 
   @override
-  void onDifferenceChanged({int? difference, int? maximum, int? minimum}){
+  void onDifferenceChanged(int? difference){
     setState(() {
       if(difference != null){
         _difference = difference.toString();
       }
-      if(maximum != null){
-        _maximum = maximum.toString();
-      }
-      if(minimum != null){
-        _minimum = minimum.toString();
+      else {
+        _difference = "";
       }
     });
   }
@@ -64,5 +61,29 @@ class _DifferenceResultWidgetState extends State<DifferenceResultWidget> impleme
         ),
       ]
     );
+  }
+  
+  @override
+  void onMaximumChanged(int? maximum) {
+    setState(() {
+      if(maximum != null){
+        _maximum = maximum.toString();
+      }
+      else {
+        _maximum = "";
+      }
+    });
+  }
+  
+  @override
+  void onMinimumChanged(int? minimum) {
+    setState(() {
+      if(minimum != null){
+        _minimum = minimum.toString();
+      }
+      else {
+        _minimum = "";
+      }
+    });
   }
 }

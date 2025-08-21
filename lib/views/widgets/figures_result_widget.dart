@@ -23,12 +23,8 @@ class _FiguresResultWidgetState extends State<FiguresResultWidget> implements Fi
 
   String _totalFigureScore = "";
   @override
-  void onFigureChanged({required YahtzeeFigure figure, required YahtzeeState? state, int? totalFigureScore}){
-    setState(() {
-      if(totalFigureScore != null){
-        _totalFigureScore = totalFigureScore.toString();
-      }
-    });
+  void onFigureChanged({required YahtzeeFigure figure, required YahtzeeState? state}){
+    // Nothing to do here
   }
 
 @override
@@ -56,5 +52,17 @@ class _FiguresResultWidgetState extends State<FiguresResultWidget> implements Fi
         ),
       ]
     );
+  }
+  
+  @override
+  void onTotalFigureScoreChanged(int? totalFigureScore) {
+    setState(() {
+      if(totalFigureScore != null){
+        _totalFigureScore = totalFigureScore.toString();
+      }
+      else {
+        _totalFigureScore = "";
+      }
+    });
   }
 }

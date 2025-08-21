@@ -24,11 +24,14 @@ class _FigureResultWidgetState extends State<FigureResultWidget> implements Figu
 
   String _score = "";
   @override
-  void onFigureChanged({required YahtzeeFigure figure, required YahtzeeState? state, int? totalFigureScore}){
+  void onFigureChanged({required YahtzeeFigure figure, required YahtzeeState? state}){
     setState(() {
       var score = widget.controller.getScoreForFigure(figure);
       if(score != null){
         _score = score.toString();
+      }
+      else {
+        _score = "";
       }
     });
   }
@@ -48,5 +51,10 @@ class _FigureResultWidgetState extends State<FigureResultWidget> implements Figu
   @override
   Widget build(BuildContext context) {
     return Text(_score);
+  }
+  
+  @override
+  void onTotalFigureScoreChanged(int? totalFigureScore) {
+    // Nothing to do here
   }
 }

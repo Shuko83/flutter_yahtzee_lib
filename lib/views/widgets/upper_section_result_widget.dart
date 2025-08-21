@@ -25,21 +25,6 @@ class _UpperSectionResultWidgetState extends State<UpperSectionResultWidget> imp
   String _totalUpperSectionScore = "";
 
   @override
-  void onNumberOfDieFaceChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore}){
-    setState(() {
-      if(totalDieFaceScore != null){
-        _totalDieFaceScore = totalDieFaceScore.toString();
-      }
-      if(bonusScore != null){
-        _bonusScore = bonusScore.toString();
-      }
-      if(upperSectionScore != null){
-        _totalUpperSectionScore = upperSectionScore.toString();
-      }
-    });
-  }
-
-  @override
   void initState() {
     super.initState();
     widget.controller.registerValuesListeners(this,notifyHistory: true);
@@ -70,5 +55,43 @@ class _UpperSectionResultWidgetState extends State<UpperSectionResultWidget> imp
         ),
       ]
     );
+  }
+  
+  @override
+  void onBonusChanged(int? bonusScore) {
+    setState(() {
+      if(bonusScore != null){
+        _bonusScore = bonusScore.toString();
+      } else {
+        _bonusScore = "";
+      }
+    });
+  }
+  
+  @override
+  void onTotalDieFaceScoreChanged(int? totalDieFaceScore) {
+    setState(() {
+      if(totalDieFaceScore != null){
+        _totalDieFaceScore = totalDieFaceScore.toString();
+      } else {
+        _totalDieFaceScore = "";
+      }
+    });
+  }
+  
+  @override
+  void onUpperSectionScoreChanged(int? upperSectionScore) {
+    setState(() {
+      if(upperSectionScore != null){
+        _totalUpperSectionScore = upperSectionScore.toString();
+      } else {
+        _totalUpperSectionScore = "";
+      }
+    });
+  }
+  
+  @override
+  void onNumberOfDieFaceChanged({required DieFace face, required int? value}) {
+    // Nothing to do here
   }
 }

@@ -24,10 +24,7 @@ class _YahtzeeBonusWidgetState extends State<YahtzeeBonusWidget> implements DieF
 
   @override
   void onNumberOfDieFaceChanged({required DieFace face, required int? value, int? bonusScore, int? upperSectionScore, int? totalDieFaceScore}){
-  /// Need to rebuild widget with correct value.
-   setState(() {
-    pointNeeded = widget.controller.getDistanceToBonus().toString();
-   }); 
+    /// Nothing to do here
   }
   
   @override
@@ -60,5 +57,22 @@ class _YahtzeeBonusWidgetState extends State<YahtzeeBonusWidget> implements DieF
     return Text('You need $pointNeeded more points to have bonus.'
     );
     }
+  }
+  
+  @override
+  void onBonusChanged(int? bonusScore) {
+    // Nothing to do here
+  }
+  
+  @override
+  void onTotalDieFaceScoreChanged(int? totalDieFaceScore) {
+    setState(() {
+      pointNeeded = widget.controller.getDistanceToBonus().toString();
+    });
+  }
+  
+  @override
+  void onUpperSectionScoreChanged(int? upperSectionScore) {
+    // Nothing to do here
   }
 }

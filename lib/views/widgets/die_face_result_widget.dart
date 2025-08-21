@@ -48,4 +48,19 @@ class _DieFaceResultWidgetState extends State<DieFaceResultWidget> implements Di
   Widget build(BuildContext context) {
     return Text(_score);
   }
+  
+  @override
+  void onBonusChanged(int? bonusScore) {
+    // Nothing to do here
+  }
+  
+  @override
+  void onTotalDieFaceScoreChanged(int? totalDieFaceScore) {
+    // Nothing to do here
+  }
+  
+  @override
+  void onUpperSectionScoreChanged(int? upperSectionScore) {
+    // Nothing to do here
+  }
 }
